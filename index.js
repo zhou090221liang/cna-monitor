@@ -7,7 +7,16 @@ const fs = require('fs');
 const _comm = require('./lib/comm');
 const path = require('path');
 const configFile = path.join(__dirname, './config/config');
-const config = JSON.parse(fs.readFileSync(configFile).toString().decrypt());
+let config;
+if (fs.existsSync(configFile)) {
+    config = JSON.parse(fs.readFileSync(configFile).toString().decrypt());
+} else {
+    config = {
+        t: 1,
+        p: 10,
+        m: 1
+    };
+}
 
 args.debug && console.log("目前的启动参数：", args);
 
