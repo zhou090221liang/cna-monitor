@@ -1,0 +1,10 @@
+*/.DS_Store
+node_modules
+.DS_Store
+.vscode/
+package-lock.json
+
+nohup.out
+config/config
+config/keys
+out/result

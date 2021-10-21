@@ -102,3 +102,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+package-lock.json
+
+nohup.out
+config/config
+config/keys
+out/result

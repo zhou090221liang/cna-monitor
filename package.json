@@ -1,0 +1,27 @@
+{
+    "name": "cna-monitor",
+    "version": "0.0.1",
+    "description": "监控域名/IP地址是否可达，并记录可访问性",
+    "author": "zxy<zxy@zhouxiaoyue.cn>",
+    "main": "index.js",
+    "bin": {
+        "cna-monitor": "./index.js"
+    },
+    "repository": {
+        "type": "git",
+        "location": "git@github.com:zhou090221liang/cna-monitor.git",
+        "url": "https://github.com/zhou090221liang/cna-monitor"
+    },
+    "keywords": [
+        "check",
+        "network",
+        "accessibility",
+        "monitor",
+        "cna"
+    ],
+    "dependencies": {
+        "fa-comm": "latest",
+        "net-ping": "^1.2.3",
+        "readline-sync": "^1.4.10"
+    }
+}
