@@ -1,6 +1,6 @@
 目前支持2种方式安装：
 1、在安装有docker环境的机器下（进阶用户推荐）：
-    docker run -d --restart always --user $(id -u):$(id -g) --cap-add=SYS_ADMIN --name cna-monitor zhou090221liang/cna-monitor cna-monitor start && docker logs -f cna-monitor
+    docker run -d --restart always --user $(id -u):$(id -g) --cap-add=SYS_ADMIN --name cna-monitor zhou090221liang/cna-monitor cna-monitor docker
 2、在没有安装有docker环境的机器下（普通用户推荐）：
     1）安装node.js环境，
         下载地址：https://nodejs.org/dist/v14.9.0/，
