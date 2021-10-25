@@ -1,5 +1,8 @@
+0.1.0
+    1、命令改版
+    2、废弃fa-comm
+    3、增加version
+
 
 待完善：
 1、list能否增加及时输出
-2、查看版本
-3、支持-v=-version -h=-hlep -l=-list

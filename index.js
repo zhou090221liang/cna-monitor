@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
-const comm = require('fa-comm');
-const args = comm.bash.getArgs();
 const readlineSync = require('readline-sync');
 const fs = require('fs');
 const _comm = require('./lib/comm');
 const path = require('path');
 const configFile = path.join(__dirname, './config/config');
+const args = _comm.convertArgs();
+args.debug && console.log("目前运行目录：", path.join(__dirname, './'));
+args.debug && console.log("输入参数：", args);
+require('./lib/proto/string');
 let config;
 if (fs.existsSync(configFile)) {
     config = JSON.parse(fs.readFileSync(configFile).toString().decrypt());
@@ -17,11 +19,15 @@ if (fs.existsSync(configFile)) {
         m: 1
     };
 }
+args.debug && console.log("配置信息：", config);
 
-args.debug && console.log("目前的启动参数：", args);
 
 if (args.help) {
     _comm.help();
+}
+
+else if (args.version) {
+    _comm.version();
 }
 
 else if (args.init) {
@@ -68,8 +74,8 @@ else if (args.status) {
 
 else if (args.add) {
     try {
-        _comm.add(args.add || "", args.name || "");
-        const answer = readlineSync.question(`添加【目标：${args.add || ""}${args.name ? `(别名：${args.name})` : ""}】成功,是否重启监控程序(y/n)？`);
+        _comm.add(args.ip || "", args.name || "");
+        const answer = readlineSync.question(`添加【目标：${args.ip || ""}${args.name ? `(别名：${args.name})` : ""}】成功,是否重启监控程序(y/n)？`);
         if (answer.toLowerCase() == 'y') {
             _comm.stop();
             _comm.start();
@@ -83,8 +89,8 @@ else if (args.add) {
 
 else if (args.delete) {
     try {
-        _comm.delete(args.delete || "");
-        const answer = readlineSync.question(`删除成功，是否重启监控程序(y/n)？`);
+        _comm.delete(args.ip || "");
+        const answer = readlineSync.question(`删除【目标：${args.ip || ""}】成功，是否重启监控程序(y/n)？`);
         if (answer.toLowerCase() == 'y') {
             _comm.stop();
             _comm.start();
@@ -99,7 +105,7 @@ else if (args.delete) {
 else if (args.list) {
     console.info("时间\t目标\t别名\t状态\t输出");
     let result = _comm.list();
-    if (comm.typeof(args.t) == 'string') {
+    if (args.t) {
         result = result.filter(item => item.target == args.t || item.alias == args.t);
     }
     let pageIndex = 1, startIndex = 0, endIndex = 0;
@@ -124,7 +130,7 @@ else if (args.list) {
 }
 
 else {
-    console.warn('请使用"cna-monitor -help"查看启动帮助');
+    console.warn('请使用"cna-monitor help"查看启动帮助');
     process.exit();
 }
 

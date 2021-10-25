@@ -1,6 +1,6 @@
 {
     "name": "cna-monitor",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "description": "监控域名/IP地址是否可达，并记录可访问性",
     "author": "zxy<zxy@zhouxiaoyue.cn>",
     "main": "index.js",
@@ -20,8 +20,8 @@
         "cna"
     ],
     "dependencies": {
-        "fa-comm": "latest",
         "net-ping": "^1.2.3",
-        "readline-sync": "^1.4.10"
+        "readline-sync": "^1.4.10",
+        "iconv-lite": "^0.5.0"
     }
 }
