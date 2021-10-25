@@ -5,7 +5,9 @@ const fs = require('fs');
 const _comm = require('./lib/comm');
 const path = require('path');
 const configFile = path.join(__dirname, './config/config');
+const portFile = path.join(__dirname, './config/port');
 const args = _comm.convertArgs();
+const defaultConfig = require('./default/config');
 args.debug && console.log("目前运行目录：", path.join(__dirname, './'));
 args.debug && console.log("输入参数：", args);
 require('./lib/proto/string');
@@ -13,11 +15,7 @@ let config;
 if (fs.existsSync(configFile)) {
     config = JSON.parse(fs.readFileSync(configFile).toString().decrypt());
 } else {
-    config = {
-        t: 1,
-        p: 10,
-        m: 1
-    };
+    config = defaultConfig;
 }
 args.debug && console.log("配置信息：", config);
 
@@ -28,6 +26,23 @@ if (args.help) {
 
 else if (args.version) {
     _comm.version();
+}
+
+else if (args.docker) {
+    const portHelp = require('./lib/port');
+    if (!fs.existsSync(portFile)) {
+        portHelp.getRandomUnUsePort().then(function (port) {
+            fs.writeFileSync(portFile, port.toString().encrypt());
+            createListen(port);
+        });
+    } else {
+        const port = parseInt(fs.readFileSync(portFile).toString().decrypt());
+        portHelp.checkPortIsUsed(port).then(function (isUsed) {
+            if (!isUsed) {
+                createListen(port);
+            }
+        });
+    }
 }
 
 else if (args.init) {
@@ -146,4 +161,14 @@ function show(result, pageIndex, pageSize) {
         console.info(`${result[i].time}\t${result[i].target}\t${result[i].alias}\t${result[i].status}\t${result[i].message || ""}`);
     }
     return isEnd;
+}
+
+function createListen(port) {
+    const server = require('http').createServer();
+    if (args.debug) {
+        server.on('listening', function () {
+            console.info(`docker环境为了防止自动停止，需要一直监听(${server.address().port})`);
+        });
+    }
+    server.listen(port);
 }

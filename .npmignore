@@ -7,4 +7,5 @@ package-lock.json
 nohup.out
 config/config
 config/keys
+config/port
 out/result
