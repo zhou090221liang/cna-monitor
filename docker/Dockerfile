@@ -1,14 +1,10 @@
 # 编译命令：docker build -t zhou090221liang/cna-monitor .
-# 启动命令：docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor -v /:/host zhou090221liang/cna-monitor cna-monitor docker
+# 启动命令：docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor -v /:/host zhou090221liang/cna-monitor sh -c "cna-monitor start & cna-monitor docker"
 # 进入命令：docker exec -it cna-monitor bash
 # 停止并删除命令：docker stop cna-monitor && docker rm cna-monitor
 # 升级命令：
 #   $ docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor zhou090221liang/cna-monitor
-#   $ docker exec -it cna-monitor bash
-#   $ chown -R 1000:1000 "/.npm"
-#   $ npm install --unsafe-perm=true --allow-rootcd cna-monitor -g
-#   $ cna-monitor -v
-#   $ exit
+#   $ docker exec -it cna-monitor sh -c "npm install --unsafe-perm=true --allow-rootcd cna-monitor -g && cna-monitor -v"
 #   $ docker commit cna-monitor zhou090221liang/cna-monitor 
 #   $ docker push zhou090221liang/cna-monitor 
 #   $ docker stop cna-monitor && docker rm cna-monitor

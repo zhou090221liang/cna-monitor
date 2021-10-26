@@ -158,6 +158,7 @@ else if (args.list) {
                 //监听器回调有两个参数 (eventType, filename)。 eventType 是 'rename' 或 'change'，filename 是触发事件的文件的名称。
                 fs.watch(outFile, function (eventType, filename) {
                     if (eventType == 'change') {
+                        slog.clear();
                         text = fs.readFileSync(outFile).toString().split('\r\n');
                         maxLen = _keys.length * 2;
                         maxLen = maxLen < config.p ? config.p : maxLen;
