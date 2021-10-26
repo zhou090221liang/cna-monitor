@@ -149,8 +149,10 @@ else if (args.list) {
                 }
                 let _text = [];
                 for (let i = maxLen - 1; i >= 0; i--) {
-                    let tmp = JSON.parse(text[i].decrypt());
-                    _text.push(`${tmp.time}\t${tmp.target}\t${tmp.alias}\t${tmp.status}\t${tmp.message || ""}`);
+                    try {
+                        let tmp = JSON.parse(text[i].decrypt());
+                        _text.push(`${tmp.time}\t${tmp.target}\t${tmp.alias}\t${tmp.status}\t${tmp.message || ""}`);
+                    } catch (e) { }
                 }
                 slog(_text.join('\r\n'));
                 //监听器回调有两个参数 (eventType, filename)。 eventType 是 'rename' 或 'change'，filename 是触发事件的文件的名称。
@@ -164,8 +166,10 @@ else if (args.list) {
                         }
                         let _text = [];
                         for (let i = maxLen; i >= 0; i--) {
-                            let tmp = JSON.parse(text[i].decrypt());
-                            _text.push(`${tmp.time}\t${tmp.target}\t${tmp.alias}\t${tmp.status}\t${tmp.message || ""}`);
+                            try {
+                                let tmp = JSON.parse(text[i].decrypt());
+                                _text.push(`${tmp.time}\t${tmp.target}\t${tmp.alias}\t${tmp.status}\t${tmp.message || ""}`);
+                            } catch (e) { }
                         }
                         slog(_text.join('\r\n'));
                     }

@@ -1,5 +1,5 @@
 # 编译命令：docker build -t zhou090221liang/cna-monitor .
-# 启动命令：docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor zhou090221liang/cna-monitor cna-monitor docker
+# 启动命令：docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor -v /:/host zhou090221liang/cna-monitor cna-monitor docker
 # 进入命令：docker exec -it cna-monitor bash
 # 停止并删除命令：docker stop cna-monitor && docker rm cna-monitor
 # 升级命令：
