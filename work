@@ -15,6 +15,9 @@
     2、增加config命令，单独设置每一个配置
 0.4.1
     1、修复部分Bug
+0.4.2
+    1、修复部分Bug
+
 
 待完善：
 1、list能否增加及时输出 fs.watchFile/require('tail').Tail 每一次监控单独加密后append进去，这样就能监控每行变化了 OK

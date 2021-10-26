@@ -1,6 +1,6 @@
 {
     "name": "cna-monitor",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "监控域名/IP地址是否可达，并记录可访问性",
     "author": "zxy<zxy@zhouxiaoyue.cn>",
     "main": "index.js",
