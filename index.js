@@ -132,6 +132,29 @@ else if (args.delete) {
     }
 }
 
+else if (args.remove) {
+    try {
+        _comm.stop();
+        if (fs.existsSync(keysFile)) {
+            fs.unlinkSync(keysFile);
+        }
+        console.info(`清空监听目标完成！`);
+    } catch (e) {
+        console.warn('清空监听目标失败');
+        args.debug && console.error(e);
+    }
+}
+
+else if (args.email) {
+    try {
+        _comm.email(args);
+        console.info(`设置email通知成功`);
+    } catch (e) {
+        console.warn('设置email通知失败');
+        args.debug && console.error(e);
+    }
+}
+
 else if (args.list) {
     console.info("时间\t目标\t别名\t状态\t输出");
     if (args.f) {

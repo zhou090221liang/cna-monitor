@@ -19,8 +19,14 @@
     1、修复部分Bug
 0.4.3
     1、修复部分Bug
+0.5.0
+    1、支持remove命令，移除所有的监听目标
+    2、支持配置email后，发送邮件通知变化
 
 待完善：
 1、list能否增加及时输出 fs.watchFile/require('tail').Tail 每一次监控单独加密后append进去，这样就能监控每行变化了 OK
 2、各配置单独设置 cna-monitor config -t 2 OK
 3、导入可以选择性导入keys或配置
+4、邮件通知，且备份导入包含email信息，init增加-n 通知邮件，config增加相关配置及显示 OK
+5、支持remove OK
+6、日志记录
