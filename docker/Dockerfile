@@ -1,3 +1,5 @@
+# 注意：下方node下载目录，需要根据自身的系统版本，修改对应的路径
+
 # 编译命令：docker build -t zhou090221liang/cna-monitor .
 # 启动命令：docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor -v /:/host zhou090221liang/cna-monitor sh -c "cna-monitor start & cna-monitor docker"
 # 进入命令：docker exec -it cna-monitor bash
