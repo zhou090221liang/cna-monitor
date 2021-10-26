@@ -10,8 +10,11 @@
     1、修复部分Bug
 0.3.0
     1、增加备份导入功能
+0.4.0
+    1、list命令支持-f参数
+    2、增加config命令，单独设置每一个配置
 
 待完善：
-1、list能否增加及时输出 fs.watchFile/require('tail').Tail 每一次监控单独加密后append进去，这样就能监控每行变化了
-2、各配置单独设置 cna-monitor config -t 2
+1、list能否增加及时输出 fs.watchFile/require('tail').Tail 每一次监控单独加密后append进去，这样就能监控每行变化了 OK
+2、各配置单独设置 cna-monitor config -t 2 OK
 3、导入可以选择性导入keys或配置

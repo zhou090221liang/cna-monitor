@@ -11,6 +11,7 @@ const defaultConfig = require('./default/config');
 args.debug && console.log("目前运行目录：", path.join(__dirname, './'));
 args.debug && console.log("输入参数：", args);
 require('./lib/proto/string');
+require('./lib/proto/date');
 let config;
 if (fs.existsSync(configFile)) {
     config = JSON.parse(fs.readFileSync(configFile).toString().decrypt());
@@ -18,7 +19,9 @@ if (fs.existsSync(configFile)) {
     config = defaultConfig;
 }
 args.debug && console.log("配置信息：", config);
-
+const outFile = path.join(__dirname, './out/result');
+const keysFile = path.join(__dirname, './config/keys');
+const slog = require('single-line-log').stdout;
 
 if (args.help) {
     _comm.help();
@@ -131,28 +134,80 @@ else if (args.delete) {
 
 else if (args.list) {
     console.info("时间\t目标\t别名\t状态\t输出");
-    let result = _comm.list();
-    if (args.t) {
-        result = result.filter(item => item.target == args.t || item.alias == args.t);
-    }
-    let pageIndex = 1, startIndex = 0, endIndex = 0;
-    let pageSize = args.p || config.p || 10;
-    if (result.length <= pageSize) {
-        for (const r of result) {
-            console.info(`${r.time}\t${r.target}\t${r.alias}\t${r.status}\t${r.message || ""}`);
+    if (args.f) {
+        try {
+            if (fs.existsSync(outFile)) {
+                let _keys = [];
+                if (fs.existsSync(keysFile)) {
+                    _keys = JSON.parse(fs.readFileSync(keysFile).toString().decrypt());
+                }
+                let text = fs.readFileSync(outFile).toString().split('\r\n');
+                let maxLen = _keys.length * 2;
+                maxLen = maxLen < config.p ? config.p : maxLen;
+                if (maxLen > text.length) {
+                    maxLen = text.length;
+                }
+                let _text = [];
+                for (let i = maxLen - 1; i >= 0; i--) {
+                    let tmp = JSON.parse(text[i].decrypt());
+                    _text.push(`${tmp.time}\t${tmp.target}\t${tmp.alias}\t${tmp.status}\t${tmp.message || ""}`);
+                }
+                slog(_text.join('\r\n'));
+                //监听器回调有两个参数 (eventType, filename)。 eventType 是 'rename' 或 'change'，filename 是触发事件的文件的名称。
+                fs.watch(outFile, function (eventType, filename) {
+                    if (eventType == 'change') {
+                        text = fs.readFileSync(outFile).toString().split('\r\n');
+                        maxLen = _keys.length * 2;
+                        maxLen = maxLen < config.p ? config.p : maxLen;
+                        if (maxLen > text.length) {
+                            maxLen = text.length;
+                        }
+                        let _text = [];
+                        for (let i = maxLen; i >= 0; i--) {
+                            let tmp = JSON.parse(text[i].decrypt());
+                            _text.push(`${tmp.time}\t${tmp.target}\t${tmp.alias}\t${tmp.status}\t${tmp.message || ""}`);
+                        }
+                        slog(_text.join('\r\n'));
+                    }
+                });
+            } else {
+                console.warn(`目标状态记录不存在，请稍后再试`);
+                process.exit();
+            }
+        } catch (e) {
+            console.warn(`监听异常`);
+            process.exit();
         }
+        // setInterval(() => {
+        //     slog(new Date().format() + "\r\n" + new Date().valueOf());
+        //     if (new Date().format('ss') == '00') {
+        //         slog.clear();
+        //     }
+        // }, 1000);
     } else {
-        let totalPage = parseInt(result.length / pageSize);
-        if (result.length % pageSize) {
-            totalPage++;
+        let result = _comm.list();
+        if (args.t) {
+            result = result.filter(item => item.target == args.t || item.alias == args.t);
         }
-        let isEnd = show(result, pageIndex, pageSize);
-        while (!isEnd) {
-            readlineSync.question(` ---------- MORE (${pageIndex}/${totalPage}) ----------`);
-            pageIndex++;
-            isEnd = show(result, pageIndex, pageSize);
+        let pageIndex = 1, startIndex = 0, endIndex = 0;
+        let pageSize = args.p || config.p || 10;
+        if (result.length <= pageSize) {
+            for (const r of result) {
+                console.info(`${r.time}\t${r.target}\t${r.alias}\t${r.status}\t${r.message || ""}`);
+            }
+        } else {
+            let totalPage = parseInt(result.length / pageSize);
+            if (result.length % pageSize) {
+                totalPage++;
+            }
+            let isEnd = show(result, pageIndex, pageSize);
+            while (!isEnd) {
+                readlineSync.question(` ---------- MORE (${pageIndex}/${totalPage}) ----------`);
+                pageIndex++;
+                isEnd = show(result, pageIndex, pageSize);
+            }
+            process.exit();
         }
-        process.exit();
     }
 }
 
