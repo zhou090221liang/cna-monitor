@@ -53,6 +53,10 @@ else if (args.import) {
     _comm.import(args);
 }
 
+else if (args.config) {
+    _comm.config(args);
+}
+
 else if (args.init) {
     const pid = _comm.checkProcess();
     let answer;
