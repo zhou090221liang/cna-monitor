@@ -50,7 +50,7 @@ else if (args.logs) {
                         let _text = [];
                         slog.clear();
                         text = fs.readFileSync(logFile).toString().split(os.EOL);
-                        let start = text.length - 10;
+                        let start = text.length - 200;
                         if (start < 0) {
                             start = 0;
                         }
@@ -240,7 +240,7 @@ else if (args.email) {
             console.info(`设置email通知成功`);
         }
     } catch (e) {
-        console.warn('设置email通知失败');
+        console.warn('邮件服务器连接失败');
         args.debug && console.error(e);
         log.error('设置email通知失败', e);
     }
