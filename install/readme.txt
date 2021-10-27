@@ -10,3 +10,10 @@
         Mac下载pkg安装即可；
         Linux需要下载源代码进行编译或下载对应架构的二进制文件后做软连接（具体请自行百度）
     2）npm install --unsafe-perm=true --allow-rootcd cna-monitor -g
+
+Docker升级命令：
+docker run -d --restart always --cap-add=SYS_ADMIN --name cna-monitor-update zhou090221liang/cna-monitor &&
+docker exec -it cna-monitor-update sh -c "npm install --unsafe-perm=true --allow-rootcd cna-monitor -g && cna-monitor -v"  && \
+docker commit cna-monitor-update zhou090221liang/cna-monitor && \
+docker push zhou090221liang/cna-monitor && \
+docker stop cna-monitor-update && docker rm cna-monitor-update
