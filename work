@@ -24,6 +24,7 @@
     2、支持配置email后，发送邮件通知变化
 0.6.0
     1、增加日志服务
+    2、优化部分代码
 
 待完善：
 1、list能否增加及时输出 fs.watchFile/require('tail').Tail 每一次监控单独加密后append进去，这样就能监控每行变化了 OK
