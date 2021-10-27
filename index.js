@@ -29,7 +29,7 @@ const os = require('os');
 log.info("运行命令：", args);
 
 if (args.help) {
-    _comm.help();
+    _comm.help(args);
 }
 
 else if (args.version) {
@@ -61,17 +61,37 @@ else if (args.logs) {
                     }
                 });
             }
-        } else if (args.clear) {
-            const logPath = path.join(__dirname, './logs/');
-            if (fs.existsSync(logPath)) {
-                fs.readdirSync(logPath).forEach(function (file) {
-                    var curPath = logPath + "/" + file;
-                    if (curPath.endsWith('.log')) {
-                        fs.unlinkSync(curPath);
-                    }
-                });
+        } else if (args.s) {
+            const logPath = path.join(__dirname, './logs/' + args.s);
+            if (!fs.existsSync(logPath)) {
+                console.info("指定的日志文件不存在");
+                return;
             }
-            console.info('日志清理完成');
+            const result = fs.readFileSync(logPath).toString().split(os.EOL);
+            // slog(text.join('\r\n'));
+
+            let pageIndex = 1, startIndex = 0, endIndex = 0;
+            let pageSize = args.p || config.p || 10;
+            if (result.length <= pageSize) {
+                for (const r of result) {
+                    console.info(r);
+                }
+            } else {
+                let totalPage = parseInt(result.length / pageSize);
+                if (result.length % pageSize) {
+                    totalPage++;
+                }
+                let isEnd = showText(result, pageIndex, pageSize);
+                while (!isEnd) {
+                    readlineSync.question(` ---------- MORE (${pageIndex}/${totalPage}) ----------`);
+                    pageIndex++;
+                    isEnd = showText(result, pageIndex, pageSize);
+                }
+                process.exit();
+            }
+
+
+
         } else if (args.l) {
             const logs = [];
             const logPath = path.join(__dirname, './logs/');
@@ -84,6 +104,17 @@ else if (args.logs) {
                 });
             }
             console.info(logs.join('\r\n'));
+        } else if (args.clear) {
+            const logPath = path.join(__dirname, './logs/');
+            if (fs.existsSync(logPath)) {
+                fs.readdirSync(logPath).forEach(function (file) {
+                    var curPath = logPath + "/" + file;
+                    if (curPath.endsWith('.log')) {
+                        fs.unlinkSync(curPath);
+                    }
+                });
+            }
+            console.info('日志清理完成');
         }
     } catch (e) {
         console.info("操作失败");
@@ -342,6 +373,20 @@ function show(result, pageIndex, pageSize) {
     }
     for (let i = startIndex; i <= endIndex; i++) {
         console.info(`${result[i].time}\t${result[i].target}\t${result[i].alias}\t${result[i].status}\t${result[i].message || ""}`);
+    }
+    return isEnd;
+}
+
+function showText(result, pageIndex, pageSize) {
+    let isEnd = false;
+    startIndex = (pageIndex - 1) * pageSize;
+    endIndex = pageIndex * pageSize - 1;
+    if (endIndex >= result.length) {
+        endIndex = result.length - 1;
+        isEnd = true;
+    }
+    for (let i = startIndex; i <= endIndex; i++) {
+        console.info(result[i]);
     }
     return isEnd;
 }
