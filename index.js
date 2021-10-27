@@ -6,6 +6,7 @@ const _comm = require('./lib/comm');
 const path = require('path');
 const configFile = path.join(__dirname, './config/config');
 const portFile = path.join(__dirname, './config/port');
+const emailFile = path.join(__dirname, './config/email');
 const args = _comm.convertArgs();
 const defaultConfig = require('./default/config');
 args.debug && console.log("目前运行目录：", path.join(__dirname, './'));
@@ -22,6 +23,10 @@ args.debug && console.log("配置信息：", config);
 const outFile = path.join(__dirname, './out/result');
 const keysFile = path.join(__dirname, './config/keys');
 const slog = require('single-line-log').stdout;
+const log = require('./lib/log');
+const os = require('os');
+
+log.info("运行命令：", args);
 
 if (args.help) {
     _comm.help();
@@ -31,18 +36,79 @@ else if (args.version) {
     _comm.version();
 }
 
+else if (args.logs) {
+    try {
+        if (args.export && args.export !== true) {
+            _comm.zip(path.join(__dirname, './logs/'), args.export);
+        }
+        else if (args.f) {
+            const logFile = path.join(__dirname, './logs/' + new Date().format('yyyyMMdd') + '.log');
+            if (fs.existsSync(logFile)) {
+                //监听器回调有两个参数 (eventType, filename)。 eventType 是 'rename' 或 'change'，filename 是触发事件的文件的名称。
+                fs.watch(logFile, function (eventType, filename) {
+                    if (eventType == 'change') {
+                        let _text = [];
+                        slog.clear();
+                        text = fs.readFileSync(logFile).toString().split(os.EOL);
+                        let start = text.length - 10;
+                        if (start < 0) {
+                            start = 0;
+                        }
+                        for (let i = start; i < text.length; i++) {
+                            _text.push(text[i]);
+                        }
+                        slog(_text.join('\r\n'));
+                    }
+                });
+            }
+        } else if (args.clear) {
+            const logPath = path.join(__dirname, './logs/');
+            if (fs.existsSync(logPath)) {
+                fs.readdirSync(logPath).forEach(function (file) {
+                    var curPath = logPath + "/" + file;
+                    if (curPath.endsWith('.log')) {
+                        fs.unlinkSync(curPath);
+                    }
+                });
+            }
+            console.info('日志清理完成');
+        } else if (args.l) {
+            const logs = [];
+            const logPath = path.join(__dirname, './logs/');
+            if (fs.existsSync(logPath)) {
+                fs.readdirSync(logPath).forEach(function (file) {
+                    if (file.endsWith('.log')) {
+                        const stat = fs.statSync(logPath + file);
+                        logs.push(`${file}\t${stat.mtime.format()}\t${_comm.sizeFormat(stat.size, true)}`);
+                    }
+                });
+            }
+            console.info(logs.join('\r\n'));
+        }
+    } catch (e) {
+        console.info("操作失败");
+        args.debug && console.warn("操作失败", e);
+        log.error("log命令操作失败", e);
+    }
+}
+
 else if (args.docker) {
     const portHelp = require('./lib/port');
     if (!fs.existsSync(portFile)) {
         portHelp.getRandomUnUsePort().then(function (port) {
+            log.info("随机未使用端口号", port);
             fs.writeFileSync(portFile, port.toString().encrypt());
             createListen(port);
         });
     } else {
         const port = parseInt(fs.readFileSync(portFile).toString().decrypt());
+        log.info("上次端口号", port);
         portHelp.checkPortIsUsed(port).then(function (isUsed) {
             if (!isUsed) {
+                log.info("端口号未被占用");
                 createListen(port);
+            } else {
+                log.warn("端口号已被占用，说明正在监听，无需操作");
             }
         });
     }
@@ -113,7 +179,9 @@ else if (args.add) {
             process.exit(1);
         }
     } catch (e) {
-        console.warn('添加失败：', e.message);
+        console.warn('添加失败');
+        args.debug && console.error(e);
+        log.warn('添加失败：', e);
     }
 }
 
@@ -128,7 +196,9 @@ else if (args.delete) {
             process.exit(1);
         }
     } catch (e) {
-        console.warn('删除失败：', e.message);
+        console.warn('删除失败');
+        args.debug && console.error(e);
+        log.warn('删除失败：', e);
     }
 }
 
@@ -142,16 +212,37 @@ else if (args.remove) {
     } catch (e) {
         console.warn('清空监听目标失败');
         args.debug && console.error(e);
+        log.error("清空监听目标失败", e);
     }
 }
 
 else if (args.email) {
     try {
-        _comm.email(args);
-        console.info(`设置email通知成功`);
+        if (args.l) {
+            if (fs.existsSync(emailFile)) {
+                const emailConfig = JSON.parse(fs.readFileSync(emailFile).toString().decrypt());
+                console.info(`已配置发送邮件服务器：`);
+                console.info(`SMTP服务器：`, emailConfig.host);
+                console.info(`SMTP服务器端口：`, emailConfig.port);
+                console.info(`是否SSL：`, emailConfig.secure);
+                console.info(`账号：`, emailConfig.user);
+                console.info(`密码：********`);
+            } else {
+                console.info(`未配置发送邮件服务器`);
+            }
+        } else if (args.clear) {
+            if (fs.existsSync(emailFile)) {
+                fs.unlinkSync(emailFile);
+            }
+            console.info(`清空发送邮件服务器配置完成`);
+        } else {
+            _comm.email(args);
+            console.info(`设置email通知成功`);
+        }
     } catch (e) {
         console.warn('设置email通知失败');
         args.debug && console.error(e);
+        log.error('设置email通知失败', e);
     }
 }
 
@@ -204,14 +295,10 @@ else if (args.list) {
             }
         } catch (e) {
             console.warn(`监听异常`);
+            args.debug && console.error(e);
+            log.error('监听异常', e);
             process.exit();
         }
-        // setInterval(() => {
-        //     slog(new Date().format() + "\r\n" + new Date().valueOf());
-        //     if (new Date().format('ss') == '00') {
-        //         slog.clear();
-        //     }
-        // }, 1000);
     } else {
         let result = _comm.list();
         if (args.t) {
@@ -240,6 +327,7 @@ else if (args.list) {
 }
 
 else {
+    log.info("运行不存在的命令", args);
     console.warn('请使用"cna-monitor help"查看启动帮助');
     process.exit();
 }
@@ -262,7 +350,7 @@ function createListen(port) {
     const server = require('http').createServer();
     if (args.debug) {
         server.on('listening', function () {
-            console.info(`docker环境为了防止自动停止，需要一直监听(${server.address().port})`);
+            log.info(`docker环境为了防止自动停止，需要一直监听(${server.address().port})`);
         });
     }
     server.listen(port);

@@ -8,4 +8,5 @@ nohup.out
 config/config
 config/keys
 config/port
+config/email
 out/result
