@@ -4,9 +4,15 @@ node_modules
 .vscode/
 package-lock.json
 
+work
 nohup.out
 config/config
 config/keys
 config/port
 config/email
+config/time
 out/result
+test/email
+docker/
+install/
+logs/*.log

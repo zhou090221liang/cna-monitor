@@ -179,6 +179,10 @@ else if (args.keys) {
     }
 }
 
+else if (args.upgrade) {
+    _comm.upgrade();
+}
+
 else if (args.restart) {
     _comm.stop();
     _comm.start();

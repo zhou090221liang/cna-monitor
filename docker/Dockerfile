@@ -13,7 +13,7 @@
 
 # 升级命令（没有镜像和容器）：重新编译本文件
 
-# 升级之后的导入配置：cna-monitor import /host/cna-backup/backup_20211026140149211.cna
+# 升级之后的导入配置：cna-monitor import /host/cna-backup/backup_xxxxxxxxxx.cna
 
 # 下载依赖镜像（耗时较长）
 FROM raspbian/stretch
